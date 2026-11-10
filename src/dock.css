@@ -1,0 +1,459 @@
+:root {
+  color-scheme: light dark;
+  --ink: #20242c;
+  --ink-soft: rgba(32, 36, 44, 0.58);
+  --amber: #c4832c;
+  --amber-bright: #a56518;
+  --amber-soft: rgba(196, 131, 44, 0.16);
+  --green: #4c9a6a;
+  --glass-hi: rgba(255, 255, 255, 0.94);
+  --glass-lo: rgba(255, 255, 255, 0.62);
+  --glass-border: rgba(255, 255, 255, 0.86);
+  --shadow: rgba(15, 23, 42, 0.42);
+  --ease-bloom: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ui-font:
+    'Segoe UI Variable Text',
+    'Segoe UI',
+    'Microsoft YaHei UI',
+    'PingFang SC',
+    system-ui,
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--ui-font);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+.dock-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  font-family: var(--ui-font);
+  color: var(--ink);
+}
+
+.defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.dock-hit {
+  position: absolute;
+  display: block;
+  width: 68px;
+  height: 88px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  transition: opacity 0.14s ease;
+}
+
+.dock-root[data-edge='right'] .dock-hit {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.dock-root[data-edge='left'] .dock-hit {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.dock-root[data-edge='top'] .dock-hit {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 88px;
+  height: 68px;
+}
+
+.dock-root[data-edge='bottom'] .dock-hit {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 88px;
+  height: 68px;
+}
+
+.dock-hit:focus-visible {
+  outline: 2px solid rgba(196, 131, 44, 0.55);
+  outline-offset: 3px;
+  border-radius: 18px;
+}
+
+.dock-hit:active {
+  cursor: grabbing;
+}
+
+.dock-bar {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(100% 100% at 50% 100%, rgba(224, 164, 92, 0.2), transparent 66%),
+    radial-gradient(120% 100% at 25% 12%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.42) 64%),
+    linear-gradient(150deg, var(--glass-hi), var(--glass-lo));
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 10px 24px -10px var(--shadow),
+    0 0 0 1px rgba(196, 131, 44, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98);
+  opacity: 0.95;
+  transition:
+    opacity 0.16s ease,
+    transform 0.3s var(--ease-spring);
+}
+
+.dock-root[data-edge='right'] .dock-bar {
+  right: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 22px;
+  border-radius: 999px 0 0 999px;
+}
+
+.dock-root[data-edge='left'] .dock-bar {
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 22px;
+  border-radius: 0 999px 999px 0;
+}
+
+.dock-root[data-edge='top'] .dock-bar {
+  top: 0;
+  left: 4px;
+  right: 4px;
+  height: 22px;
+  border-radius: 0 0 999px 999px;
+}
+
+.dock-root[data-edge='bottom'] .dock-bar {
+  bottom: 0;
+  left: 4px;
+  right: 4px;
+  height: 22px;
+  border-radius: 999px 999px 0 0;
+}
+
+.dock-bar svg {
+  width: 16px;
+  height: 16px;
+  color: var(--amber-bright);
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.55));
+}
+
+.dock-ball {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  background:
+    radial-gradient(120% 100% at 25% 12%, rgba(255, 255, 255, 0.97), rgba(255, 255, 255, 0.4) 62%),
+    radial-gradient(90% 90% at 50% 105%, rgba(224, 164, 92, 0.22), transparent 62%),
+    linear-gradient(150deg, var(--glass-hi), var(--glass-lo));
+  box-shadow:
+    0 22px 44px -16px var(--shadow),
+    0 0 0 1px rgba(84, 64, 38, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+  opacity: 0;
+  --ball-scale: 0.7;
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    transform 0.34s var(--ease-spring),
+    box-shadow 0.3s ease;
+}
+
+.dock-root[data-edge='right'] .dock-ball {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%) scale(var(--ball-scale));
+  transform-origin: 100% 50%;
+}
+
+.dock-root[data-edge='left'] .dock-ball {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%) scale(var(--ball-scale));
+  transform-origin: 0 50%;
+}
+
+.dock-root[data-edge='top'] .dock-ball {
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%) scale(var(--ball-scale));
+  transform-origin: 50% 0;
+}
+
+.dock-root[data-edge='bottom'] .dock-ball {
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%) scale(var(--ball-scale));
+  transform-origin: 50% 100%;
+}
+
+.dock-root.is-peek .dock-ball {
+  --ball-scale: 1;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.dock-root.is-peek .dock-bar {
+  opacity: 0;
+  transform: scale(0.82);
+}
+
+.orb-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ring-track {
+  fill: none;
+  stroke: rgba(32, 36, 44, 0.08);
+  stroke-width: 1;
+}
+
+.ring-arc {
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 118 50;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(116deg);
+  filter: drop-shadow(0 0 5px rgba(224, 164, 92, 0.32));
+  transition: transform 0.76s var(--ease-out);
+}
+
+.dock-root.is-peek .ring-arc {
+  transform: rotate(136deg);
+}
+
+.glyph {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+}
+
+.glyph svg {
+  display: block;
+  width: 21px;
+  height: 21px;
+}
+
+.dock-dot {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 3;
+  width: 7px;
+  height: 7px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 3px rgba(76, 154, 106, 0.14);
+}
+
+.dock-root.is-hidden .dock-hit,
+.dock-root.is-grabbing .dock-hit {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.guides {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease;
+}
+
+.dock-root.is-dragging .guides {
+  opacity: 1;
+}
+
+.dock-root.is-releasing .guides {
+  opacity: 0;
+}
+
+.guide {
+  position: absolute;
+  background: linear-gradient(90deg, transparent, var(--amber), transparent);
+  opacity: 0.28;
+  transition:
+    opacity 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.guide-top {
+  left: 8%;
+  right: 8%;
+  top: 0;
+  height: 2px;
+}
+
+.guide-bottom {
+  left: 8%;
+  right: 8%;
+  bottom: 0;
+  height: 2px;
+}
+
+.guide-left {
+  top: 8%;
+  bottom: 8%;
+  left: 0;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, var(--amber), transparent);
+}
+
+.guide-right {
+  top: 8%;
+  bottom: 8%;
+  right: 0;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, var(--amber), transparent);
+}
+
+.guide.is-active {
+  opacity: 1;
+  box-shadow: 0 0 18px 2px rgba(224, 164, 92, 0.35);
+}
+
+.drag-orb {
+  position: absolute;
+  left: -200px;
+  top: -200px;
+  z-index: 25;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  background:
+    radial-gradient(120% 100% at 25% 12%, rgba(255, 255, 255, 0.97), rgba(255, 255, 255, 0.4) 62%),
+    radial-gradient(90% 90% at 50% 105%, rgba(224, 164, 92, 0.22), transparent 62%),
+    linear-gradient(150deg, var(--glass-hi), var(--glass-lo));
+  box-shadow:
+    0 26px 54px -16px var(--shadow),
+    0 0 0 1px rgba(84, 64, 38, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  will-change: left, top, transform, opacity;
+  transition: opacity 0.16s ease;
+}
+
+.dock-root.is-dragging .drag-orb {
+  opacity: 1;
+}
+
+.drag-orb.is-snapping {
+  transition:
+    left 0.24s var(--ease-bloom),
+    top 0.24s var(--ease-bloom),
+    transform 0.24s var(--ease-bloom),
+    opacity 0.18s ease 0.1s;
+}
+
+.dock-root.is-snapped .dock-bar {
+  animation: bar-in 0.4s var(--ease-spring);
+}
+
+.dock-root.is-returning .dock-bar {
+  animation: bar-in 0.36s var(--ease-spring);
+}
+
+@keyframes bar-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.62);
+  }
+  100% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #eef1f6;
+    --ink-soft: rgba(238, 241, 246, 0.62);
+    --amber: #e0a45c;
+    --amber-bright: #e9b46b;
+    --amber-soft: rgba(224, 164, 92, 0.18);
+    --glass-hi: rgba(52, 57, 68, 0.9);
+    --glass-lo: rgba(28, 32, 41, 0.74);
+    --glass-border: rgba(255, 255, 255, 0.16);
+    --shadow: rgba(0, 0, 0, 0.55);
+  }
+
+  .dock-ball,
+  .drag-orb {
+    background:
+      radial-gradient(120% 100% at 25% 12%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.05) 62%),
+      radial-gradient(90% 90% at 50% 105%, rgba(224, 164, 92, 0.2), transparent 62%),
+      linear-gradient(150deg, var(--glass-hi), var(--glass-lo));
+  }
+
+  .dock-dot {
+    border-color: rgba(20, 24, 31, 0.9);
+  }
+
+  .ring-track {
+    stroke: rgba(255, 255, 255, 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-bar,
+  .dock-ball,
+  .ring-arc,
+  .drag-orb,
+  .guides,
+  .dock-hit {
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .dock-root.is-snapped .dock-bar,
+  .dock-root.is-returning .dock-bar {
+    animation: none;
+  }
+}

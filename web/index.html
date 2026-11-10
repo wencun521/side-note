@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>随手记 Side Note — 贴在屏幕边缘的一张纸</title>
+    <meta
+      name="description"
+      content="随手记是一个常驻屏幕边缘的 Windows 便签。悬停浮出笔球，点击从球里长出一张毛玻璃便签，移开鼠标自动收起。网页上可以直接体验交互原型。"
+    />
+    <meta name="theme-color" content="#f4efe6" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="随手记 Side Note — 贴在屏幕边缘的一张纸" />
+    <meta
+      property="og:description"
+      content="悬停浮出笔球，点击长出一张毛玻璃便签，移开自动收起。在网页里直接体验交互原型。"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23f4efe6'/%3E%3Ccircle cx='16' cy='16' r='9.2' fill='none' stroke='%23b57624' stroke-width='1.6'/%3E%3Cpath d='M10.8 20.6l.7-2.4 5.2-5.2a1.2 1.2 0 0 1 1.7 1.7l-5.2 5.2-2.4.7Z' fill='none' stroke='%2323262b' stroke-width='1.4' stroke-linejoin='round'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <header class="nav" id="nav">
+      <div class="container nav-inner">
+        <a class="brand" href="#top" aria-label="随手记首页">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 19.2 6.2 15l9.5-9.5a2.16 2.16 0 0 1 3.06 3.06L9.3 18l-4.3 1.2Z" />
+              <path d="m14.4 6.6 3 3" />
+            </svg>
+          </span>
+          <span class="brand-text">随手记<em>Side Note</em></span>
+        </a>
+        <nav class="nav-links" aria-label="页面导航">
+          <a href="#demo">交互演示</a>
+          <a href="#features">特性</a>
+          <a href="#craft">实现</a>
+          <a href="#design">设计</a>
+        </nav>
+        <a class="btn btn-small" href="#start">本地运行</a>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero container">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>Windows 11 · Electron · 本地优先</p>
+          <h1>
+            贴在屏幕<br />
+            边缘的<span class="hero-accent">一张纸。</span>
+          </h1>
+          <p class="lede">
+            平时只是一条安静的玻璃条。悬停，笔形球浮出来；点击，便签从球里长出来。写完移开鼠标，它自己收回去。
+          </p>
+          <div class="hero-actions">
+            <a class="btn" href="#demo">玩一下网页原型</a>
+            <a class="btn btn-ghost" href="#craft">看它怎么实现</a>
+          </div>
+          <dl class="hero-metrics">
+            <div><dt>58<small>px</small></dt><dd>笔球直径</dd></div>
+            <div><dt>500<small>ms</small></dt><dd>从球展开</dd></div>
+            <div><dt>1<small>s</small></dt><dd>移开自动收起</dd></div>
+          </dl>
+        </div>
+
+        <figure class="hero-demo demo reveal" id="demo">
+          <div class="demo-stage" id="demoStage" aria-label="随手记交互演示区域">
+            <div class="desk-scene" aria-hidden="true">
+              <span class="desk-glow desk-glow-amber"></span>
+              <span class="desk-glow desk-glow-blue"></span>
+              <span class="desk-glow desk-glow-green"></span>
+              <span class="desk-window desk-window-a"></span>
+              <span class="desk-window desk-window-b"></span>
+              <span class="desk-window desk-window-c"></span>
+              <span class="desk-photo"></span>
+              <span class="desk-note"></span>
+            </div>
+
+            <div class="guides" id="guides" aria-hidden="true">
+              <span class="guide guide-top" data-edge="top"></span>
+              <span class="guide guide-right" data-edge="right"></span>
+              <span class="guide guide-bottom" data-edge="bottom"></span>
+              <span class="guide guide-left" data-edge="left"></span>
+            </div>
+
+            <div class="dock" id="dock" data-edge="right">
+              <span class="dock-bar" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 19.2 6.2 15l9.5-9.5a2.16 2.16 0 0 1 3.06 3.06L9.3 18l-4.3 1.2Z" />
+                  <path d="m14.4 6.6 3 3" />
+                </svg>
+              </span>
+              <span class="dock-ball" aria-hidden="true">
+                <svg class="orb-ring" viewBox="0 0 58 58">
+                  <circle class="ring-track" cx="29" cy="29" r="27.4" />
+                  <circle class="ring-arc" cx="29" cy="29" r="27.4" />
+                </svg>
+                <span class="glyph">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 19.2 6.2 15l9.5-9.5a2.16 2.16 0 0 1 3.06 3.06L9.3 18l-4.3 1.2Z" />
+                    <path d="m14.4 6.6 3 3" />
+                  </svg>
+                </span>
+                <span class="dock-dot"></span>
+              </span>
+              <button class="dock-hit" id="dockHit" type="button" aria-label="打开随手记便签" title="悬停浮出笔球，点击打开；按住可拖动">
+                <span class="sr-only">打开随手记便签</span>
+              </button>
+            </div>
+
+            <div class="drag-orb" id="dragOrb" aria-hidden="true">
+              <svg class="orb-ring" viewBox="0 0 58 58">
+                <circle class="ring-track" cx="29" cy="29" r="27.4" />
+                <circle class="ring-arc" cx="29" cy="29" r="27.4" />
+              </svg>
+              <span class="glyph">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 19.2 6.2 15l9.5-9.5a2.16 2.16 0 0 1 3.06 3.06L9.3 18l-4.3 1.2Z" />
+                  <path d="m14.4 6.6 3 3" />
+                </svg>
+              </span>
+              <span class="dock-dot"></span>
+            </div>
+
+            <div class="demo-note is-hidden" id="note" data-edge="right" role="dialog" aria-modal="false" aria-label="随手记便签示例" aria-hidden="true">
+              <div class="note-surface" aria-hidden="true">
+                <span class="note-tint"></span>
+              </div>
+              <div class="note-content">
+                <header class="note-bar">
+                  <div class="note-title"><span class="note-mark" aria-hidden="true"></span>随手记</div>
+                  <div class="note-tools">
+                    <button class="tool" id="pinBtn" type="button" aria-label="固定便签" aria-pressed="false" title="固定便签">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9.2 4h5.6l-.75 4.55 2.95 2.95H7l2.95-2.95z" />
+                        <path d="M12 11.5V20" />
+                      </svg>
+                    </button>
+                    <button class="tool" id="closeBtn" type="button" aria-label="收起便签" title="收起便签">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                        <path d="m7.5 7.5 9 9m0-9-9 9" />
+                      </svg>
+                    </button>
+                  </div>
+                </header>
+                <textarea
+                  class="note-editor"
+                  id="noteText"
+                  aria-label="便签内容"
+                  placeholder="随手记点什么…"
+                  spellcheck="true"
+                ></textarea>
+                <footer class="note-foot">
+                  <span class="save-state" id="saveState"><span class="save-dot" aria-hidden="true"></span><span id="saveText">自动保存</span></span>
+                  <span class="note-hint">Esc 收起</span>
+                </footer>
+              </div>
+            </div>
+
+            <p class="stage-caption">网页复刻 · 拖拽笔球可换边</p>
+          </div>
+
+          <figcaption class="demo-bar">
+            <p class="demo-tip" id="demoTip" aria-live="polite">把鼠标移到右边缘的玻璃条上。</p>
+            <button class="reset-btn" id="resetDemo" type="button">重置演示</button>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="section features container" id="features">
+        <div class="section-head reveal">
+          <p class="eyebrow">WHY IT FEELS DIFFERENT</p>
+          <h2>没有后台，没有账号，<br />只有一张随手可用的纸。</h2>
+          <p class="section-lede">
+            所有交互都围绕一件事：别打断你正在做的事。它不弹通知、不占任务栏，也不要求你切换窗口。
+          </p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature reveal">
+            <span class="feature-no">01</span>
+            <span class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="7" cy="17" r="3" />
+                <rect x="10" y="4" width="10" height="14" rx="4" />
+              </svg>
+            </span>
+            <h3>从球里长出来</h3>
+            <p>便签的展开原点就是悬浮球球心，圆角、描边、毛玻璃一起长大，中途不会闪白底。</p>
+          </article>
+          <article class="feature reveal">
+            <span class="feature-no">02</span>
+            <span class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="4" width="16" height="16" rx="4" />
+                <path d="M16 4v16" />
+                <circle cx="16" cy="12" r="2.4" fill="currentColor" stroke="none" />
+              </svg>
+            </span>
+            <h3>四条边都能停</h3>
+            <p>按住笔球拖到任意一边，松手吸附到最近的边缘，位置下次打开还在。</p>
+          </article>
+          <article class="feature reveal">
+            <span class="feature-no">03</span>
+            <span class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 12a8 8 0 1 1-2.34-5.66" />
+                <path d="M20 4v4h-4" />
+              </svg>
+            </span>
+            <h3>移开就收起</h3>
+            <p>写完把鼠标移开一秒，便签缩回笔球。需要它多留一会儿时，点一下固定。</p>
+          </article>
+          <article class="feature reveal">
+            <span class="feature-no">04</span>
+            <span class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3 5 6v5c0 4.4 3 7.6 7 9 4-1.4 7-4.6 7-9V6l-7-3Z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+            </span>
+            <h3>只留在本机</h3>
+            <p>正文保存在本地浏览器存储里，不登录、不联网、不做同步，关掉应用也还在。</p>
+          </article>
+          <article class="feature reveal">
+            <span class="feature-no">05</span>
+            <span class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.2 4h5.6l-.75 4.55 2.95 2.95H7l2.95-2.95z" />
+                <path d="M12 11.5V20" />
+              </svg>
+            </span>
+            <h3>需要时钉住</h3>
+            <p>固定后不再自动收起，适合对着资料抄写、贴一段临时清单，或者让它陪你看完一集。</p>
+          </article>
+          <article class="feature reveal">
+            <span class="feature-no">06</span>
+            <span class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="6" width="18" height="12" rx="3" />
+                <path d="M7 10h.01M11 10h.01M15 10h.01M18 10h.01M7 14h.01M18 14h.01M10 14h4" />
+              </svg>
+            </span>
+            <h3>键盘也顺手</h3>
+            <p>打开即聚焦正文，输入自动保存，Esc 随时收起。没有多余的确认和弹窗。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="craft" id="craft">
+        <div class="container craft-inner">
+          <div class="craft-copy reveal">
+            <p class="eyebrow eyebrow-light">HOW IT WORKS</p>
+            <h2>玻璃不是滤镜，<br />是提前拍下的一张桌面。</h2>
+            <p class="lede">
+              Windows 的系统毛玻璃只能铺满整个矩形窗口，跟不上圆角和形变，所以这里换了一种做法：把桌面截图裁成便签大小，模糊后夹在两层之间。
+            </p>
+            <ul class="craft-list">
+              <li><strong>两块透明窗口。</strong>96×96 的停靠层负责笔球和拖拽，384×560 的舞台负责便签。</li>
+              <li><strong>形变只改 transform。</strong>球和便签共用一个原点，底图反向缩放，所以玻璃看起来是静止的。</li>
+              <li><strong>点击不等待 IO。</strong>截图在空闲时缓存，点击到窗口显示实测 9–19ms。</li>
+              <li><strong>先显示，再隐藏。</strong>便签窗口接管笔球之后，停靠层才退场，没有空档。</li>
+            </ul>
+          </div>
+          <div class="craft-visual reveal">
+            <div class="layer-stack" aria-label="玻璃分层示意：桌面截图、模糊、白色叠层、高光边">
+              <div class="stack-layer stack-screen"><span>01 · 桌面截图</span></div>
+              <div class="stack-layer stack-blur"><span>02 · blur 8px</span></div>
+              <div class="stack-layer stack-tint"><span>03 · 白色叠层</span></div>
+              <div class="stack-layer stack-edge"><span>04 · 1px 高光边</span></div>
+            </div>
+            <div class="chip-row" aria-label="关键参数">
+              <span class="chip">58px 笔球</span>
+              <span class="chip">384 × 560 舞台</span>
+              <span class="chip">500 / 330ms 形变</span>
+              <span class="chip">8px blur</span>
+              <span class="chip">1s 自动收起</span>
+              <span class="chip">32ms 轮询</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section design container" id="design">
+        <div class="section-head reveal">
+          <p class="eyebrow">DESIGN NOTES</p>
+          <h2>安静，是设计的一部分。</h2>
+          <p class="section-lede">一套很小的视觉系统：一个琥珀色、一层霜、几条 1px 的高光边。所有强调都只发生在需要被看见的那一刻。</p>
+        </div>
+        <div class="token-grid">
+          <article class="token-card reveal">
+            <h3>颜色</h3>
+            <div class="swatch-row">
+              <span class="swatch swatch-amber"><b>#C4832C</b><i>琥珀</i></span>
+              <span class="swatch swatch-ink"><b>#20242C</b><i>墨</i></span>
+              <span class="swatch swatch-frost"><b>#F4F6FA</b><i>霜</i></span>
+              <span class="swatch swatch-paper"><b>#F4EFE6</b><i>纸</i></span>
+            </div>
+            <p>颜色不承担装饰，只承担状态：琥珀是光标、固定和正在发生的事。</p>
+          </article>
+          <article class="token-card reveal">
+            <h3>形状</h3>
+            <div class="radius-row">
+              <span class="radius-sample radius-note">24</span>
+              <span class="radius-sample radius-pill">999</span>
+              <span class="radius-sample radius-tool">9</span>
+            </div>
+            <p>贴边一侧是直角，另一侧 24px；球和玻璃条永远保持圆形与胶囊，不参与形变。</p>
+          </article>
+          <article class="token-card reveal">
+            <h3>字与节奏</h3>
+            <div class="type-sample">
+              <span class="type-line">把想到的，先写下来。</span>
+              <span class="type-meta">15px · 1.72 · 0.01em · Segoe UI Variable</span>
+            </div>
+            <p>正文 15px，标题 11px 且拉宽字距。动效只用 transform 和 opacity，展开 500ms，收起 330ms。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="start" id="start">
+        <div class="container start-card reveal">
+          <div class="start-copy">
+            <p class="eyebrow">RUN IT LOCALLY</p>
+            <h2>在 Windows 上跑起来。</h2>
+            <p class="section-lede">
+              目前以源码方式使用，Windows 安装包、托盘和开机自启还在规划中。官网上的便签是交互复刻，真实应用由 Electron 双窗口驱动。
+            </p>
+            <div class="req-row" aria-label="运行要求">
+              <span class="chip">Windows 11</span>
+              <span class="chip">Node.js 24+</span>
+              <span class="chip">无需账号</span>
+            </div>
+          </div>
+          <div class="start-code">
+            <div class="code-head">
+              <span class="code-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <button class="copy-btn" id="copyCmd" type="button" data-copy="npm install&#10;npm run dev">复制命令</button>
+            </div>
+            <pre class="code"><code><span class="code-comment"># 在项目根目录</span>
+npm install
+npm run dev</code></pre>
+            <p class="code-foot">开发模式会同时启动 Vite 与 Electron；<code>npm run build</code> 产出静态页面。</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div class="brand footer-brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 19.2 6.2 15l9.5-9.5a2.16 2.16 0 0 1 3.06 3.06L9.3 18l-4.3 1.2Z" />
+              <path d="m14.4 6.6 3 3" />
+            </svg>
+          </span>
+          <span class="brand-text">随手记<em>Side Note</em></span>
+        </div>
+        <p class="footer-note">本地优先 · 无账号 · 无网络请求</p>
+        <nav class="footer-links" aria-label="页脚导航">
+          <a href="#demo">演示</a>
+          <a href="#craft">实现</a>
+          <a href="#design">设计</a>
+          <a href="#start">运行</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="./demo.js" defer></script>
+    <script src="./site.js" defer></script>
+  </body>
+</html>

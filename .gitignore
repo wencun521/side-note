@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.log
+
+# Electron/Chromium 运行产物
+NVIDIA Corporation/
+
+# 验证截图
+final-state.png
+
+# Sites 工作台生成的发布描述（含内嵌构建产物）
+*.qoder.site

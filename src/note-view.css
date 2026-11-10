@@ -1,0 +1,394 @@
+:root {
+  color-scheme: light dark;
+  --ink: #20242c;
+  --ink-soft: rgba(32, 36, 44, 0.58);
+  --ink-faint: rgba(32, 36, 44, 0.4);
+  --hover: rgba(20, 25, 35, 0.06);
+  --amber: #c4832c;
+  --amber-bright: #a56518;
+  --amber-soft: rgba(196, 131, 44, 0.16);
+  --glass-border: rgba(255, 255, 255, 0.86);
+  --stage-radius: 24px;
+  --ease-bloom: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-close: cubic-bezier(0.55, 0, 0.8, 0.35);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ui-font:
+    'Segoe UI Variable Text',
+    'Segoe UI',
+    'Microsoft YaHei UI',
+    'PingFang SC',
+    system-ui,
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+html,
+body {
+  background: transparent;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--ui-font);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+.view {
+  --origin-x: 50%;
+  --origin-y: 50%;
+  --sx: 0.15;
+  --sy: 0.1;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.note-surface {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  background: transparent;
+  transform: scale(var(--sx), var(--sy));
+  transform-origin: var(--origin-x) var(--origin-y);
+  will-change: transform, border-radius;
+  transition: border-radius 330ms var(--ease-close);
+}
+
+.note-frost {
+  position: absolute;
+  inset: -32px;
+  z-index: 0;
+  background-color: #f4f6fa;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  filter: blur(8px) saturate(1.32);
+  transform-origin: calc(var(--origin-x) + 32px) calc(var(--origin-y) + 32px);
+  will-change: transform;
+  pointer-events: none;
+}
+
+.note-tint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, 0.55), transparent 58%),
+    linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.62) 58%,
+      rgba(255, 255, 255, 0.88) 100%
+    );
+  pointer-events: none;
+}
+
+.view.is-open .note-surface {
+  transition:
+    border-radius 500ms var(--ease-bloom),
+    border-color 200ms ease;
+}
+
+.view.is-open[data-edge='right'] .note-surface {
+  border-radius: var(--stage-radius) 0 0 var(--stage-radius);
+  border-right-width: 0;
+}
+
+.view.is-open[data-edge='left'] .note-surface {
+  border-radius: 0 var(--stage-radius) var(--stage-radius) 0;
+  border-left-width: 0;
+}
+
+.view.is-open[data-edge='top'] .note-surface {
+  border-radius: 0 0 var(--stage-radius) var(--stage-radius);
+  border-top-width: 0;
+}
+
+.view.is-open[data-edge='bottom'] .note-surface {
+  border-radius: var(--stage-radius) var(--stage-radius) 0 0;
+  border-bottom-width: 0;
+}
+
+.note-content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(10px) scale(0.996);
+  pointer-events: none;
+  transition:
+    opacity 120ms ease,
+    transform 160ms ease;
+}
+
+.view[data-edge='right'] .note-content {
+  border-radius: var(--stage-radius) 0 0 var(--stage-radius);
+}
+
+.view[data-edge='left'] .note-content {
+  border-radius: 0 var(--stage-radius) var(--stage-radius) 0;
+}
+
+.view[data-edge='top'] .note-content {
+  border-radius: 0 0 var(--stage-radius) var(--stage-radius);
+}
+
+.view[data-edge='bottom'] .note-content {
+  border-radius: var(--stage-radius) var(--stage-radius) 0 0;
+}
+
+.view.is-open.is-ready .note-content {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition:
+    opacity 180ms ease,
+    transform 240ms var(--ease-out);
+}
+
+.view.is-closing .note-content {
+  transition:
+    opacity 110ms ease,
+    transform 120ms ease;
+}
+
+.note-bar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  padding: 19px 14px 10px 22px;
+}
+
+.note-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+}
+
+.note-mark {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-soft);
+}
+
+.note-tools {
+  display: flex;
+  gap: 3px;
+}
+
+.tool {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.12s ease;
+}
+
+.tool:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+
+.tool:active {
+  transform: scale(0.94);
+}
+
+.tool:focus-visible {
+  outline: 2px solid rgba(196, 131, 44, 0.5);
+  outline-offset: 1px;
+}
+
+.tool svg {
+  width: 15px;
+  height: 15px;
+}
+
+.tool.is-active {
+  color: var(--amber-bright);
+  background: var(--amber-soft);
+}
+
+.note-editor {
+  flex: 1 1 auto;
+  width: 100%;
+  padding: 8px 22px 10px;
+  border: 0;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--ui-font);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.72;
+  letter-spacing: 0.01em;
+  caret-color: var(--amber);
+  user-select: text;
+}
+
+.note-editor::placeholder {
+  color: var(--ink-faint);
+}
+
+.note-editor::selection {
+  background: rgba(196, 131, 44, 0.24);
+}
+
+.note-editor::-webkit-scrollbar {
+  width: 6px;
+}
+
+.note-editor::-webkit-scrollbar-thumb {
+  background: rgba(127, 137, 155, 0.22);
+  border-radius: 999px;
+}
+
+.note-foot {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 16px 14px 22px;
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.save-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.save-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(196, 131, 44, 0.72);
+  transition: opacity 0.2s ease;
+}
+
+.save-state.is-saving .save-dot {
+  animation: pulse 0.9s ease-in-out infinite;
+}
+
+.note-hint {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0.82;
+}
+
+.quit {
+  padding: 3px 5px;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--ink-faint);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.quit:hover {
+  color: var(--ink);
+  background: var(--hover);
+}
+
+.quit:focus-visible {
+  outline: 2px solid rgba(196, 131, 44, 0.5);
+  outline-offset: 1px;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #eef1f6;
+    --ink-soft: rgba(238, 241, 246, 0.62);
+    --ink-faint: rgba(238, 241, 246, 0.4);
+    --hover: rgba(255, 255, 255, 0.08);
+    --amber: #e0a45c;
+    --amber-bright: #e9b46b;
+    --amber-soft: rgba(224, 164, 92, 0.18);
+    --glass-border: rgba(255, 255, 255, 0.16);
+  }
+
+  .note-frost {
+    background-color: #1c2029;
+  }
+
+  .note-tint {
+    background:
+      radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, 0.14), transparent 58%),
+      linear-gradient(
+        150deg,
+        rgba(52, 57, 68, 0.86) 0%,
+        rgba(28, 32, 41, 0.72) 58%,
+        rgba(52, 57, 68, 0.84) 100%
+      );
+  }
+
+  .note-editor::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note-surface,
+  .note-content {
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .save-state.is-saving .save-dot {
+    animation: none;
+  }
+}

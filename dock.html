@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>随手记</title>
+    <link rel="stylesheet" href="/src/dock.css" />
+  </head>
+  <body>
+    <div class="dock-root" id="dockRoot" data-edge="right">
+      <svg class="defs" width="0" height="0" aria-hidden="true">
+        <defs>
+          <linearGradient id="ringGrad" x1="12" y1="8" x2="46" y2="50" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#e0a45c" />
+            <stop offset="1" stop-color="#c4832c" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <div class="guides" aria-hidden="true">
+        <span class="guide guide-top" data-edge="top"></span>
+        <span class="guide guide-right" data-edge="right"></span>
+        <span class="guide guide-bottom" data-edge="bottom"></span>
+        <span class="guide guide-left" data-edge="left"></span>
+      </div>
+
+      <button
+        type="button"
+        class="dock-hit"
+        id="dockHit"
+        aria-label="打开随手记"
+        title="按住拖动可吸附到屏幕边缘，点击打开"
+      >
+        <span class="dock-bar" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 19.2 6.2 15l9.5-9.5a2.16 2.16 0 0 1 3.06 3.06L9.3 18l-4.3 1.2Z" />
+            <path d="m14.4 6.6 3 3" />
+          </svg>
+        </span>
+
+        <span class="dock-ball" aria-hidden="true">
+          <svg class="orb-ring" viewBox="0 0 58 58">
+            <circle class="ring-track" cx="29" cy="29" r="27.4" />
+            <circle class="ring-arc" cx="29" cy="29" r="27.4" stroke="url(#ringGrad)" />
+          </svg>
+          <span class="glyph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 19.2 6.2 15l9.5-9.5a2.16 2.16 0 0 1 3.06 3.06L9.3 18l-4.3 1.2Z" />
+              <path d="m14.4 6.6 3 3" />
+            </svg>
+          </span>
+          <span class="dock-dot"></span>
+        </span>
+      </button>
+
+      <div class="drag-orb" id="dragOrb" aria-hidden="true">
+        <svg class="orb-ring" viewBox="0 0 58 58">
+          <circle class="ring-track" cx="29" cy="29" r="27.4" />
+          <circle class="ring-arc" cx="29" cy="29" r="27.4" stroke="url(#ringGrad)" />
+        </svg>
+        <span class="glyph">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 19.2 6.2 15l9.5-9.5a2.16 2.16 0 0 1 3.06 3.06L9.3 18l-4.3 1.2Z" />
+            <path d="m14.4 6.6 3 3" />
+          </svg>
+        </span>
+        <span class="dock-dot"></span>
+      </div>
+    </div>
+    <script type="module" src="/src/dock.ts"></script>
+  </body>
+</html>

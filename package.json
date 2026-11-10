@@ -1,0 +1,29 @@
+{
+  "name": "side-note",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A glassy side-docked quick note for Windows",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "concurrently -k -s first \"vite\" \"wait-on tcp:127.0.0.1:5173 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .\"",
+    "build": "vite build",
+    "preview": "vite build && electron .",
+    "start": "electron ."
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "concurrently": "^10.0.7",
+    "cross-env": "^10.1.0",
+    "electron": "^45.2.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.7",
+    "wait-on": "^9.5.1"
+  }
+}
